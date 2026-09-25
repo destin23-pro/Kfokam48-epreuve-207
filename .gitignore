@@ -1,0 +1,9 @@
+
+# Frontend (Node / Vite)
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.vite/
+
+# Maven (backend) — aucun fichier compilé dans l'historique
+backend/target/
