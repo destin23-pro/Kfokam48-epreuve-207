@@ -1,0 +1,6 @@
+{
+  "name": "KFOKAM48 - Suivi des Présences et Évaluations",
+  "description": "Système académique de gestion des présences en temps réel, dépôts d'exercices, relectures croisées et tableau de bord formateur.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
