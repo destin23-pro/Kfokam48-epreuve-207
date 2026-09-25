@@ -14,6 +14,9 @@ public interface RelectureRepository extends JpaRepository<Relecture, Long> {
 
     List<Relecture> findByExerciceIdAndStatus(Long exerciceId, RelectureStatus status);
 
+    /** Relectures attribuées à un exercice (au plus deux, RG7). */
+    List<Relecture> findByExerciceId(Long exerciceId);
+
     /** Relectures dont l'étudiant est le relecteur (ce qu'il doit faire / a fait). */
     List<Relecture> findByEtudiantIdOrderBySoumissionAtDesc(Long etudiantId);
 

@@ -110,9 +110,9 @@ public class ExerciceService {
         return mapToResponse(exercice);
     }
     /**
-     * RG2 (Q5) + RG7 (Q7) : un seul relecteur, tire au hasard parmi les presences
-     * de la session, jamais l'auteur lui-meme. Si personne d'autre n'est present,
-     * l'exercice reste en attente (Q11).
+     * RG2 (Q5) + RG7 (Q7, issue #25) : deux relecteurs differents, tires au hasard
+     * parmi les presences de la session, jamais l'auteur lui-meme. S'il n'y a qu'un
+     * autre present, un seul relecteur ; si personne, l'exercice reste en attente (Q11).
      */
     private void assignerRelecteur(Session session, Etudiant auteur, Exercice exercice) {
         List<Etudiant> presents = presenceRepository.findAllBySessionId(session.getId())
@@ -126,17 +126,17 @@ public class ExerciceService {
             return; // aucun relecteur disponible : l'exercice reste en attente (Q11)
         }
 
-        Collections.shuffle(presents);
-        Etudiant relecteur = presents.get(0);
-
-        Relecture relecture = Relecture.builder()
-                .exercice(exercice)
-                .etudiant(relecteur)
-                .status(RelectureStatus.EN_ATTENTE)
-                .soumissionAt(LocalDateTime.now())
-                .build();
-
-        relectureRepository.save(relecture);
+        List<Etudiant> tirage = new java.util.ArrayList<>(presents);
+        Collections.shuffle(tirage);
+        tirage.stream()
+                .limit(NoteExercice.RELECTEURS_PAR_EXERCICE)
+                .map(relecteur -> Relecture.builder()
+                        .exercice(exercice)
+                        .etudiant(relecteur)
+                        .status(RelectureStatus.EN_ATTENTE)
+                        .soumissionAt(LocalDateTime.now())
+                        .build())
+                .forEach(relectureRepository::save);
         exercice.setStatus(ExerciceStatus.EN_RELECTURE);
         exerciceRepository.save(exercice);
     }
@@ -160,6 +160,14 @@ public class ExerciceService {
         response.setEtudiantId(exercice.getEtudiant().getId());
         response.setLien(exercice.getLien());
         response.setSoumissionAt(exercice.getSoumissionAt());
+
+        // RG14 / RG15 : note = moyenne des relectures rendues, provisoire si une seule.
+        List<Relecture> rendues = relectureRepository.findByExerciceIdAndStatus(exercice.getId(), RelectureStatus.REALISE);
+        NoteExercice note = NoteExercice.calculer(rendues.stream().map(Relecture::getNote).toList());
+        response.setNote(note.note());
+        response.setNoteProvisoire(note.provisoire());
+        response.setRelecturesRendues(note.relecturesRendues());
+        response.setCommentaires(rendues.stream().map(Relecture::getCommentaire).toList());
         return response;
     }
 }
