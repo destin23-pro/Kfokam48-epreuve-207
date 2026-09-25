@@ -10,6 +10,7 @@ import {
   getTableauApi,
   DEFAULT_BASE_URL,
 } from './lib/api';
+import { planifierChargementTableau } from './lib/rafraichissement';
 import { Promotion, EtudiantInfo, SessionResponse, TableauLigne } from './types';
 
 function App() {
@@ -82,6 +83,15 @@ function App() {
       cancelled = true;
     };
   }, [apiUrl]);
+
+  // Tableau du formateur : chargé pendant que l'écran formateur est affiché (issue #23).
+  useEffect(() => {
+    if (currentRole !== 'formateur') return;
+    return planifierChargementTableau(
+      () => refreshTableau(selectedPromotionId).catch(() => {}),
+      5000
+    );
+  }, [currentRole, selectedPromotionId, refreshTableau]);
 
   const activeSession = useMemo(() => {
     const now = Date.now();
