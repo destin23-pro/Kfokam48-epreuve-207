@@ -1,0 +1,223 @@
+import {
+  Promotion,
+  EtudiantInfo,
+  TableauLigne,
+  SessionResponse,
+  RelectureItem,
+} from '../types';
+
+export const PROMOTIONS_INITIALES: Promotion[] = [
+  {
+    id: 1,
+    nom: 'ING-INFO-2026 - Ingénierie Logicielle (2025-2026)',
+  },
+  {
+    id: 2,
+    nom: 'M2-DEV-CLOUD - Master 2 Cloud & DevOps (2025-2026)',
+  },
+  {
+    id: 3,
+    nom: 'L3-DATA-AI - Licence 3 Data & Intelligence Artificielle (2025-2026)',
+  },
+];
+
+export const ETUDIANTS_INITIALS: EtudiantInfo[] = [
+  { id: 101, nom: 'Fokam', prenom: 'Christian', matricule: 'KF-2026-01', email: 'c.fokam@univ-kfokam.ac', promotionId: 1 },
+  { id: 102, nom: 'Ndongmo', prenom: 'Mireille', matricule: 'KF-2026-02', email: 'm.ndongmo@univ-kfokam.ac', promotionId: 1 },
+  { id: 103, nom: 'Kamdem', prenom: 'Aristide', matricule: 'KF-2026-03', email: 'a.kamdem@univ-kfokam.ac', promotionId: 1 },
+  { id: 104, nom: 'Tchouassi', prenom: 'Sandra', matricule: 'KF-2026-04', email: 's.tchouassi@univ-kfokam.ac', promotionId: 1 },
+  { id: 105, nom: 'Biya', prenom: 'Loïc', matricule: 'KF-2026-05', email: 'l.biya@univ-kfokam.ac', promotionId: 1 },
+  { id: 106, nom: 'Moukandjo', prenom: 'Valérie', matricule: 'KF-2026-06', email: 'v.moukandjo@univ-kfokam.ac', promotionId: 1 },
+  { id: 107, nom: 'Kenmogne', prenom: 'Boris', matricule: 'KF-2026-07', email: 'b.kenmogne@univ-kfokam.ac', promotionId: 1 },
+  { id: 108, nom: 'Djoko', prenom: 'Astrid', matricule: 'KF-2026-08', email: 'a.djoko@univ-kfokam.ac', promotionId: 1 },
+  // Promo 2
+  { id: 201, nom: 'Zambo', prenom: 'Hervé', matricule: 'KF-2026-21', email: 'h.zambo@univ-kfokam.ac', promotionId: 2 },
+  { id: 202, nom: 'Ebanda', prenom: 'Clarisse', matricule: 'KF-2026-22', email: 'c.ebanda@univ-kfokam.ac', promotionId: 2 },
+  { id: 203, nom: 'Kengne', prenom: 'Franck', matricule: 'KF-2026-23', email: 'f.kengne@univ-kfokam.ac', promotionId: 2 },
+  // Promo 3
+  { id: 301, nom: 'Atangana', prenom: 'Paul', matricule: 'KF-2026-31', email: 'p.atangana@univ-kfokam.ac', promotionId: 3 },
+  { id: 302, nom: 'Mballa', prenom: 'Béatrice', matricule: 'KF-2026-32', email: 'b.mballa@univ-kfokam.ac', promotionId: 3 },
+];
+
+export const TABLEAU_INITIAL: Record<number, TableauLigne[]> = {
+  1: [
+    {
+      etudiantId: 101,
+      nom: 'Christian Fokam',
+      presences: 12,
+      exercicesDeposes: 8,
+      moyenne: 17.5,
+      relecturesEnAttente: 1,
+      email: 'c.fokam@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 102,
+      nom: 'Mireille Ndongmo',
+      presences: 11,
+      exercicesDeposes: 7,
+      moyenne: 16.0,
+      relecturesEnAttente: 0,
+      email: 'm.ndongmo@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 103,
+      nom: 'Aristide Kamdem',
+      presences: 10,
+      exercicesDeposes: 6,
+      moyenne: 14.5,
+      relecturesEnAttente: 2,
+      email: 'a.kamdem@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 104,
+      nom: 'Sandra Tchouassi',
+      presences: 12,
+      exercicesDeposes: 8,
+      moyenne: 18.2,
+      relecturesEnAttente: 0,
+      email: 's.tchouassi@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 105,
+      nom: 'Loïc Biya',
+      presences: 8,
+      exercicesDeposes: 4,
+      moyenne: 11.8,
+      relecturesEnAttente: 3,
+      email: 'l.biya@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 106,
+      nom: 'Valérie Moukandjo',
+      presences: 11,
+      exercicesDeposes: 7,
+      moyenne: 15.4,
+      relecturesEnAttente: 1,
+      email: 'v.moukandjo@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 107,
+      nom: 'Boris Kenmogne',
+      presences: 9,
+      exercicesDeposes: 5,
+      moyenne: 13.0,
+      relecturesEnAttente: 2,
+      email: 'b.kenmogne@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 108,
+      nom: 'Astrid Djoko',
+      presences: 12,
+      exercicesDeposes: 8,
+      moyenne: 19.0,
+      relecturesEnAttente: 0,
+      email: 'a.djoko@univ-kfokam.ac',
+    },
+  ],
+  2: [
+    {
+      etudiantId: 201,
+      nom: 'Hervé Zambo',
+      presences: 9,
+      exercicesDeposes: 6,
+      moyenne: 15.0,
+      relecturesEnAttente: 1,
+      email: 'h.zambo@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 202,
+      nom: 'Clarisse Ebanda',
+      presences: 10,
+      exercicesDeposes: 7,
+      moyenne: 17.2,
+      relecturesEnAttente: 0,
+      email: 'c.ebanda@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 203,
+      nom: 'Franck Kengne',
+      presences: 7,
+      exercicesDeposes: 4,
+      moyenne: 12.5,
+      relecturesEnAttente: 2,
+      email: 'f.kengne@univ-kfokam.ac',
+    },
+  ],
+  3: [
+    {
+      etudiantId: 301,
+      nom: 'Paul Atangana',
+      presences: 11,
+      exercicesDeposes: 8,
+      moyenne: 16.8,
+      relecturesEnAttente: 1,
+      email: 'p.atangana@univ-kfokam.ac',
+    },
+    {
+      etudiantId: 302,
+      nom: 'Béatrice Mballa',
+      presences: 12,
+      exercicesDeposes: 8,
+      moyenne: 18.0,
+      relecturesEnAttente: 0,
+      email: 'b.mballa@univ-kfokam.ac',
+    },
+  ],
+};
+
+export const RELECTURES_INITIALES: RelectureItem[] = [
+  {
+    id: 1,
+    exerciceId: 42,
+    exerciceTitre: 'Architecture Microservices avec Spring Boot & Eureka',
+    exerciceLien: 'https://github.com/etudiant-demo/kf48-spring-microservices',
+    auteurEtudiantId: 103,
+    auteurNom: 'Aristide Kamdem',
+    sessionId: 10,
+    sessionTitre: 'TP 04 - Découverte de services & Gateway',
+    statut: 'EN_ATTENTE',
+  },
+  {
+    id: 2,
+    exerciceId: 38,
+    exerciceTitre: 'Conteneurisation Docker & Compose Multi-Services',
+    exerciceLien: 'https://github.com/etudiant-demo/kf48-docker-compose-deploy',
+    auteurEtudiantId: 105,
+    auteurNom: 'Loïc Biya',
+    sessionId: 9,
+    sessionTitre: 'TP 03 - Dockerisation et Orchestration',
+    statut: 'EN_ATTENTE',
+  },
+  {
+    id: 3,
+    exerciceId: 35,
+    exerciceTitre: 'Sécurisation JWT & OAuth2 Resource Server',
+    exerciceLien: 'https://github.com/etudiant-demo/kf48-security-jwt-handson',
+    auteurEtudiantId: 107,
+    auteurNom: 'Boris Kenmogne',
+    sessionId: 8,
+    sessionTitre: 'TP 02 - Sécurité applicative',
+    statut: 'CORRIGE',
+    note: 16.5,
+    commentaire: 'Excellente gestion des tokens expirés et des filtres de sécurité. Code propre et testé.',
+  },
+];
+
+export const SESSIONS_HISTORIQUE_INITIALES: SessionResponse[] = [
+  {
+    id: 11,
+    code: 'KF8942',
+    titre: 'Session 05 : Architecture Microservices Spring Boot',
+    promotionId: 1,
+    ouvertureAt: new Date().toISOString(),
+    expirationAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 10,
+    code: 'KF7710',
+    titre: 'Session 04 : Patterns de Résilience & Circuit Breaker',
+    promotionId: 1,
+    ouvertureAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+    expirationAt: new Date(Date.now() - 48 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
+  },
+];
