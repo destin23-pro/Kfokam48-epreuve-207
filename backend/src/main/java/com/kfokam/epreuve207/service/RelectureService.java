@@ -78,10 +78,15 @@ public class RelectureService {
         relecture.setStatus(RelectureStatus.REALISE);
         relectureRepository.save(relecture);
 
-        // L'exercice passe au statut RELU (cycle de vie du diagramme D4).
+        // D4 (issue #25) : l'exercice passe RELU quand toutes ses relectures sont rendues ;
+        // sinon il reste EN_RELECTURE avec une note provisoire (RG15).
         Exercice exercice = relecture.getExercice();
-        exercice.setStatus(ExerciceStatus.RELU);
-        exerciceRepository.save(exercice);
+        boolean resteAFaire = !relectureRepository
+                .findByExerciceIdAndStatus(exercice.getId(), RelectureStatus.EN_ATTENTE).isEmpty();
+        if (!resteAFaire) {
+            exercice.setStatus(ExerciceStatus.RELU);
+            exerciceRepository.save(exercice);
+        }
 
         return mapToResponse(relecture);
     }
