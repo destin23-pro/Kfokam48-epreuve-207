@@ -1,7 +1,9 @@
 # Cahier des charges — Suivi de présence et relecture croisée KFOKAM48
 
-Auteur : 207 · Version 2 · Frontend choisi : React (Vite + TypeScript), parce que trois écrans simples sans rendu serveur ne justifient pas Next.js, et Vite donne un build rapide et reproductible.
+Auteur : 207 · Version 3 · Frontend choisi : React (Vite + TypeScript), parce que trois écrans simples sans rendu serveur ne justifient pas Next.js, et Vite donne un build rapide et reproductible.
 
+> Version 3 (étape 3, issue #25) : chaque exercice est relu par **deux** pairs ; la note retenue est leur moyenne, provisoire tant qu'un seul a rendu. RG7 et RG14 modifiées, RG15 ajoutée, EF5, EF6, EF7 et EF9 mis à jour. Périmètre réduit : RG4 (#12) et le remplacement du lien (#17) sont sacrifiés, voir §3.
+>
 > Version 2 : remplace la version 1, qui décrivait une pile Node/Express/Prisma avec authentification JWT. Cette version contredisait les contraintes imposées (backend Spring Boot) et la réponse du client en Q1.
 
 ## 1. Contexte et objectif
@@ -40,7 +42,8 @@ Il n'y a ni administrateur ni visiteur anonyme. Les promotions et les étudiants
 - authentification, mots de passe, rôles et sessions de connexion (Q1) ;
 - gestion des promotions et des étudiants par l'interface (création, modification, suppression) : ils sont fournis par une migration de démonstration ;
 - dépôt de fichiers : seul un lien est accepté ;
-- réattribution manuelle d'un relecteur, pluralité de relecteurs (Q6) ;
+- réattribution manuelle d'un relecteur ;
+- **sacrifiés à l'étape 3** pour tenir le passage à deux relecteurs (Must arrivé tard) : le blocage après 5 codes erronés (RG4, issue #12, Should) et le remplacement du lien d'exercice (RG9 partielle, issue #17, Could). Ce sont les deux exigences de plus basse priorité ; aucune n'empêche le parcours principal (présence → dépôt → relecture → tableau) ;
 - correction ou surcharge de la note par le formateur ;
 - export CSV/PDF, notifications, application mobile native.
 
@@ -52,11 +55,11 @@ Il n'y a ni administrateur ni visiteur anonyme. Les promotions et les étudiants
 | EF2 | L'étudiant marque sa présence avec un code | Quand il saisit un code valide et non expiré, il reçoit `201 { id, sessionId, etudiantId, source: "ETUDIANT" }` et sa présence apparaît dans le tableau. Code inconnu → `400`, déjà présent → `409`, code expiré → `410` | Must |
 | EF3 | Le formateur ajoute une présence à la main | Quand il ajoute la présence d'un étudiant (`POST /api/sessions/{id}/presences`), elle est enregistrée avec `source = "FORMATEUR"` et le tableau l'affiche « ajouté par le formateur » | Should |
 | EF4 | L'étudiant dépose le lien de son exercice | Quand il envoie `POST /api/exercices { sessionId, etudiantId, lien }` avec une URL http(s), il reçoit `201 { id, statut }`. Lien invalide → `400`, exercice déjà déposé → `409` | Must |
-| EF5 | Le système attribue un relecteur à chaque exercice | Quand un exercice est déposé et qu'au moins un autre étudiant est présent à la session, exactement une relecture est créée pour un présent tiré au hasard, jamais l'auteur | Must |
-| EF6 | Le relecteur rend une note et un commentaire | Quand il envoie `POST /api/relectures/{id} { note, commentaire }` avec une note entière de 0 à 20, il reçoit `200` et l'exercice passe à « relu ». Note invalide → `400`, propre exercice → `403`, déjà rendue → `409` | Must |
+| EF5 | Le système attribue deux relecteurs à chaque exercice | Quand un exercice est déposé et qu'au moins deux autres étudiants sont présents, deux relectures sont créées pour deux présents différents tirés au hasard, jamais l'auteur. S'il n'y en a qu'un, une seule relecture est créée | Must |
+| EF6 | Le relecteur rend une note et un commentaire | Quand il envoie `POST /api/relectures/{id} { note, commentaire }` avec une note entière de 0 à 20, il reçoit `200`. L'exercice passe à « relu » quand ses deux relectures sont rendues. Note invalide → `400`, propre exercice → `403`, déjà rendue → `409` | Must |
 | EF7 | Le formateur voit le tableau de suivi d'une promotion | Quand il appelle `GET /api/tableau?promotionId=`, il reçoit `200 [ { etudiantId, nom, presences, exercicesDeposes, moyenne, relecturesEnAttente } ]`. Promotion inconnue → `404` | Must |
 | EF8 | L'étudiant choisit son nom dans une liste | Quand il ouvre l'écran étudiant, la liste des étudiants de la promotion est chargée depuis l'API. Quand il choisit son nom, ses présences, dépôts et relectures à faire s'affichent | Must |
-| EF9 | L'étudiant relu consulte sa note | Quand la relecture de son exercice est rendue, il voit la note et le commentaire. La réponse de l'API ne contient pas l'identité du relecteur | Should |
+| EF9 | L'étudiant relu consulte sa note | Quand ses deux relectures sont rendues, il voit la moyenne des deux notes. Quand une seule l'est, il voit cette note marquée « provisoire ». La réponse ne contient pas l'identité des relecteurs | Must |
 | EF10 | Le formateur clôture une session | Quand il clôture une session, toute nouvelle présence ou tout nouveau dépôt pour cette session est refusé, et la session apparaît « clôturée » | Should |
 
 ## 5. Exigences non fonctionnelles
@@ -78,19 +81,20 @@ Il n'y a ni administrateur ni visiteur anonyme. Les promotions et les étudiants
 | RG1 | Le code de présence expire 15 minutes après l'ouverture de la session. Passé ce délai, il renvoie `410 CODE_EXPIRE` | Q2 |
 | RG2 | Un étudiant ne relit jamais son propre exercice. Une tentative renvoie `403 AUTO_RELECTURE_INTERDITE` | Q5 |
 | RG3 | La note est un entier compris entre 0 et 20. Sinon, `400 NOTE_INVALIDE` | Q9 |
-| RG4 | Après 5 codes erronés consécutifs, l'étudiant est bloqué 2 minutes (`429 TROP_DE_TENTATIVES`), même s'il saisit ensuite le bon code. Un code correct remet le compteur à zéro. Le blocage est appliqué par l'API | Q4 |
+| RG4 | *(Hors périmètre depuis l'étape 3, #12.)* Après 5 codes erronés consécutifs, l'étudiant est bloqué 2 minutes (`429 TROP_DE_TENTATIVES`), même s'il saisit ensuite le bon code. Un code correct remet le compteur à zéro. Le blocage est appliqué par l'API | Q4 |
 | RG5 | Un étudiant a au plus une présence par session. Une deuxième renvoie `409 DEJA_PRESENT`, quelle que soit la source | Q3, contrat |
 | RG6 | Aucune présence par code n'est acceptée après l'expiration du code ou la clôture de la session : `410 CODE_EXPIRE` | Q2, Q3 |
-| RG7 | Chaque exercice a au plus un relecteur, tiré au hasard parmi les étudiants présents à la session, auteur exclu. L'attribution a lieu au dépôt | Q6, Q7 |
+| RG7 | Chaque exercice a au plus **deux** relecteurs différents, tirés au hasard parmi les étudiants présents à la session, auteur exclu. L'attribution a lieu au dépôt | Q7, enveloppe (remplace Q6) |
 | RG8 | Le dépôt d'un exercice est accepté après l'expiration du code, tant que le formateur n'a pas clôturé la session | Q12 |
 | RG9 | Un étudiant dépose au plus un exercice par session (`409 EXERCICE_DEJA_DEPOSE`). Il peut en remplacer le lien tant que la relecture n'est pas rendue | Q13, contrat |
 | RG10 | Une relecture rendue est définitive : une nouvelle soumission renvoie `409 RELECTURE_DEJA_RENDUE` | Q15, contrat (voir §7) |
 | RG11 | Une présence ajoutée par le formateur porte `source = FORMATEUR`. Elle est acceptée même après l'expiration du code | Q14 |
 | RG12 | L'étudiant relu voit sa note et le commentaire, jamais l'identité du relecteur | Q8 |
 | RG13 | Un exercice sans relecture rendue reste « en attente » et apparaît comme tel dans le tableau du formateur | Q11 |
-| RG14 | La moyenne d'un étudiant est la moyenne des notes reçues sur ses exercices, arrondie au dixième et calculée par l'API. Sans note reçue, elle vaut `null` (affichée « — ») et non 0 | Q16, F3 |
+| RG14 | La note d'un exercice est la moyenne des notes rendues par ses relecteurs. La moyenne d'un étudiant est la moyenne des notes de ses exercices, arrondie au dixième et calculée par l'API. Sans note reçue, elle vaut `null` (affichée « — ») et non 0 | Q16, F3, enveloppe |
+| RG15 | Tant qu'un seul des deux relecteurs a rendu, la note de l'exercice est celle-ci, marquée provisoire (`noteProvisoire = true`) ; elle compte dans la moyenne du tableau | enveloppe |
 
-Cycle de vie d'un exercice (diagramme D4) : `DEPOSE` → `EN_RELECTURE` (relecteur attribué) → `RELU` (relecture rendue). Un exercice qui reste `DEPOSE` faute de relecteur disponible est lui aussi « en attente » au sens de RG13.
+Cycle de vie d'un exercice (diagramme D4) : `DEPOSE` → `EN_RELECTURE` (relecteurs attribués ; note provisoire dès la première relecture rendue) → `RELU` (toutes les relectures attribuées sont rendues). Un exercice qui reste `DEPOSE` faute de relecteur disponible est lui aussi « en attente » au sens de RG13.
 
 ## 7. Zones d'ombre, hypothèses et contradictions
 
@@ -107,7 +111,8 @@ Cycle de vie d'un exercice (diagramme D4) : `DEPOSE` → `EN_RELECTURE` (relecte
 | `relecturesEnAttente` | Q16 : « les relectures qu'il doit encore faire » | Nombre de relectures attribuées à l'étudiant **en tant que relecteur** et non rendues | Lecture littérale de Q16 |
 | Commentaire de relecture | Aucune question ne le précise | Obligatoire, 5 caractères minimum après suppression des espaces (`400 COMMENTAIRE_INVALIDE`) | Une relecture sans commentaire n'aide pas l'étudiant relu |
 | Code de présence inconnu | Contrat : `400` | `400 CODE_INCONNU`. Chaque code inconnu compte comme une erreur pour RG4 | C'est exactement le cas que Q4 veut empêcher |
-| Q6 | Un seul relecteur | Repris tel quel (RG7) | — |
+| Q6 puis enveloppe | Q6 : « un seul relecteur ». Étape 3 : « deux pairs différents, moyenne des deux, provisoire si un seul a rendu » | Deux relecteurs (RG7), note = moyenne (RG14), note provisoire (RG15). Si un seul autre étudiant est présent, un seul relecteur est attribué | Le client revient sur Q6 : le nouveau besoin l'emporte. Les exercices déjà relus par un seul pair restent valides (migration V6 sans perte) |
+| Moyenne du tableau avec deux relecteurs | L'enveloppe ne dit pas comment pondérer | Moyenne des **notes d'exercice** (chaque exercice pèse 1), et non de toutes les notes reçues | Sinon un exercice relu deux fois pèserait double |
 | Qui rend la relecture ? (403 du contrat) | Sans authentification (Q1), l'API ne sait pas qui appelle `POST /api/relectures/{id}` | Le corps accepte un `relecteurId` facultatif, choisi dans la liste. S'il désigne l'auteur de l'exercice → `403 AUTO_RELECTURE_INTERDITE` (RG2) ; s'il désigne un autre étudiant que le relecteur attribué → `403 RELECTURE_NON_ATTRIBUEE` | Le 403 imposé n'a de sens que si l'appelant est identifié. Le champ est facultatif pour ne pas casser le corps imposé `{ note, commentaire }` |
 | 400 ou 404 pour une référence inconnue | Le contrat donne `400 code inconnu` sur `POST /api/presences` et `404 promotion inconnue` sur `GET /api/tableau?promotionId=` | Une référence inconnue dans le **corps** renvoie 400 ; une ressource inconnue désignée par l'**URL** (chemin ou paramètre) renvoie 404 | C'est la règle qui rend les deux cas imposés cohérents ; elle s'applique à toutes les opérations ajoutées |
 | Présence manuelle (Q14) | Le code peut avoir expiré quand le formateur ajoute l'étudiant | Opération distincte `POST /api/sessions/{id}/presences { etudiantId }`, qui ne passe pas par le code | L'opération imposée `POST /api/presences` reste celle de l'étudiant, avec ses 409/410 inchangés |
