@@ -56,11 +56,12 @@ public class TableauService {
         List<ExerciceResponse> exercices = exerciceService.getExercicesByEtudiant(etudiant.getId());
         response.setExercicesDeposes(exercices.size());
 
-        // Q16 : moyenne des notes reçues sur ses exercices (et non celles qu'il a données).
-        List<Integer> notesRecues = relectureRepository.findNotesRecuesByEtudiantId(etudiant.getId());
-        // RG14 : sans note reçue, la moyenne est null (et non 0, qui serait une vraie note).
-        notesRecues.stream()
-                .mapToInt(Integer::intValue)
+        // Q16 + RG14 (issue #25) : moyenne des notes d'EXERCICE (chaque exercice pèse 1,
+        // note provisoire comprise, RG15). Sans note, la moyenne est null et non 0.
+        exercices.stream()
+                .map(ExerciceResponse::getNote)
+                .filter(java.util.Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
                 .average()
                 .ifPresentOrElse(
                         moyenne -> response.setMoyenne(Math.round(moyenne * 10.0) / 10.0),

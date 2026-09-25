@@ -70,6 +70,13 @@ public class ApiDtos {
         private Long etudiantId;
         private String lien;
         private LocalDateTime soumissionAt;
+        /** RG14 : moyenne des notes rendues, null si aucune. */
+        private Double note;
+        /** RG15 : true si une seule des deux relectures est rendue. */
+        private boolean noteProvisoire;
+        private int relecturesRendues;
+        /** Commentaires rendus, sans l'identité des relecteurs (RG12). */
+        private java.util.List<String> commentaires;
     }
 
     // -----------------------------------------------------------

@@ -24,8 +24,9 @@ public class ExerciceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/etudiants/{etudiantId}/exercices")
-    public ResponseEntity<List<ExerciceResponse>> getExercicesByEtudiant(@PathVariable Long etudiantId) {
+    /** Contrat : GET /api/exercices?etudiantId= — note, provisoire, sans relecteur (EF9, RG12, RG15). */
+    @GetMapping("/exercices")
+    public ResponseEntity<List<ExerciceResponse>> getExercicesByEtudiant(@RequestParam Long etudiantId) {
         List<ExerciceResponse> responses = exerciceService.getExercicesByEtudiant(etudiantId);
         return ResponseEntity.ok(responses);
     }
