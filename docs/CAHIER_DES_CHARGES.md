@@ -48,9 +48,9 @@ Il n'y a ni administrateur ni visiteur anonyme. Les promotions et les étudiants
 
 | Réf | Exigence | Critère d'acceptation | Priorité |
 |---|---|---|---|
-| EF1 | Le formateur ouvre une session et obtient un code de présence | Quand il envoie `POST /api/sessions { titre, promotionId }`, il reçoit `201 { id, code, ouvertureAt, expirationAt }`, avec `expirationAt = ouvertureAt + 15 min`. S'il manque un champ, il reçoit `400` | Must |
+| EF1 | Le formateur ouvre une session et obtient un code de présence | Quand il envoie `POST /api/sessions { titre, promotionId }`, il reçoit `201 { id, code, ouvertureAt, expirationAt }`, avec `expirationAt = ouvertureAt + 15 min`. S'il manque un champ ou si la promotion est inconnue, il reçoit `400` | Must |
 | EF2 | L'étudiant marque sa présence avec un code | Quand il saisit un code valide et non expiré, il reçoit `201 { id, sessionId, etudiantId, source: "ETUDIANT" }` et sa présence apparaît dans le tableau. Code inconnu → `400`, déjà présent → `409`, code expiré → `410` | Must |
-| EF3 | Le formateur ajoute une présence à la main | Quand il ajoute la présence d'un étudiant, elle est enregistrée avec `source = "FORMATEUR"` et le tableau l'affiche « ajouté par le formateur » | Should |
+| EF3 | Le formateur ajoute une présence à la main | Quand il ajoute la présence d'un étudiant (`POST /api/sessions/{id}/presences`), elle est enregistrée avec `source = "FORMATEUR"` et le tableau l'affiche « ajouté par le formateur » | Should |
 | EF4 | L'étudiant dépose le lien de son exercice | Quand il envoie `POST /api/exercices { sessionId, etudiantId, lien }` avec une URL http(s), il reçoit `201 { id, statut }`. Lien invalide → `400`, exercice déjà déposé → `409` | Must |
 | EF5 | Le système attribue un relecteur à chaque exercice | Quand un exercice est déposé et qu'au moins un autre étudiant est présent à la session, exactement une relecture est créée pour un présent tiré au hasard, jamais l'auteur | Must |
 | EF6 | Le relecteur rend une note et un commentaire | Quand il envoie `POST /api/relectures/{id} { note, commentaire }` avec une note entière de 0 à 20, il reçoit `200` et l'exercice passe à « relu ». Note invalide → `400`, propre exercice → `403`, déjà rendue → `409` | Must |
@@ -108,6 +108,9 @@ Cycle de vie d'un exercice (diagramme D4) : `DEPOSE` → `EN_RELECTURE` (relecte
 | Commentaire de relecture | Aucune question ne le précise | Obligatoire, 5 caractères minimum après suppression des espaces (`400 COMMENTAIRE_INVALIDE`) | Une relecture sans commentaire n'aide pas l'étudiant relu |
 | Code de présence inconnu | Contrat : `400` | `400 CODE_INCONNU`. Chaque code inconnu compte comme une erreur pour RG4 | C'est exactement le cas que Q4 veut empêcher |
 | Q6 | Un seul relecteur | Repris tel quel (RG7) | — |
+| Qui rend la relecture ? (403 du contrat) | Sans authentification (Q1), l'API ne sait pas qui appelle `POST /api/relectures/{id}` | Le corps accepte un `relecteurId` facultatif, choisi dans la liste. S'il désigne l'auteur de l'exercice → `403 AUTO_RELECTURE_INTERDITE` (RG2) ; s'il désigne un autre étudiant que le relecteur attribué → `403 RELECTURE_NON_ATTRIBUEE` | Le 403 imposé n'a de sens que si l'appelant est identifié. Le champ est facultatif pour ne pas casser le corps imposé `{ note, commentaire }` |
+| 400 ou 404 pour une référence inconnue | Le contrat donne `400 code inconnu` sur `POST /api/presences` et `404 promotion inconnue` sur `GET /api/tableau?promotionId=` | Une référence inconnue dans le **corps** renvoie 400 ; une ressource inconnue désignée par l'**URL** (chemin ou paramètre) renvoie 404 | C'est la règle qui rend les deux cas imposés cohérents ; elle s'applique à toutes les opérations ajoutées |
+| Présence manuelle (Q14) | Le code peut avoir expiré quand le formateur ajoute l'étudiant | Opération distincte `POST /api/sessions/{id}/presences { etudiantId }`, qui ne passe pas par le code | L'opération imposée `POST /api/presences` reste celle de l'étudiant, avec ses 409/410 inchangés |
 
 ## 8. Contraintes techniques
 
