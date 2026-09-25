@@ -81,6 +81,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    /** Verbe HTTP non prévu par le contrat : 405 au format imposé. */
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
+        ErrorResponse error = new ErrorResponse("METHODE_NON_AUTORISEE", "Méthode " + ex.getMethod() + " non prise en charge sur cette route.");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error);
+    }
+
     /** Filet de sécurité : message générique au client, stack trace dans les logs serveur uniquement. */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
