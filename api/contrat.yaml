@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: API Suivi de Présence KFOKAM48
+  version: 1.0.0
+paths:
+  /api/sessions:
+    post:
+      summary: Ouvrir une session de cours
+      responses:
+        '201':
+          description: Session créée
+  /api/presences:
+    post:
+      summary: Marquer sa présence
+      responses:
+        '201':
+          description: Présence enregistrée
+  /api/exercices:
+    post:
+      summary: Déposer un exercice
+      responses:
+        '201':
+          description: Exercice déposé
+  /api/relectures/{id}:
+    post:
+      summary: Évaluer un exercice
+      responses:
+        '200':
+          description: Relecture enregistrée
+  /api/tableau:
+    get:
+      summary: Consulter le tableau de suivi
+      responses:
+        '200':
+          description: Tableau récupéré
