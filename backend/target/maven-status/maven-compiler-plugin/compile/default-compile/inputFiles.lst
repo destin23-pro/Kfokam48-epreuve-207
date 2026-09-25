@@ -1,0 +1,15 @@
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/Product.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/User.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/dto/ApiDtos.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/Application.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/dto/OrderDTO.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/OrderStatus.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/repository/OrderRepository.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/repository/ProductRepository.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/Role.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/Order.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/service/OrderService.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/controller/AppController.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/controller/OrderController.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/model/OrderItem.java
+/home/maitol/ProfetFullstackFin/kfokam48-epreuve-207/backend/src/main/java/com/kfokam/epreuve207/repository/UserRepository.java
