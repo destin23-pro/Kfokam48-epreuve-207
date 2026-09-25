@@ -9,5 +9,11 @@ Fait : Rédaction complète des 10 sections du cahier des charges dans docs/CAHI
 ## Étape 2 — Conception & Architecture
 Fait : Définition de l'architecture technique conteneurisée avec PostgreSQL, modèle BDD SQL et intégration des 3 diagrammes Mermaid.
 
-## Étape 3 — Mise en place du Backend & Conteneurisation
-Fait : Configuration de Docker Compose pour l'environnement de base de données PostgreSQL.
+## Étape 3 — Organisation Agile & Backlog
+Fait : Découpage du projet en Epics et User Stories dans docs/BACKLOG.md.
+
+## Étape 4 — Développements Backend & API REST
+Fait : Implémentation des conteneurs Docker, entités JPA, Repositories, DTOs, Services et Controllers REST.
+
+## Étape 5 — Sécurité & JWT (US-08)
+Fait : Implémentation de Spring Security, du filtre JWT, du PasswordEncoder BCrypt et du contrôleur d'authentification /api/auth/login sur la branche feature/US-08-jwt-auth.
