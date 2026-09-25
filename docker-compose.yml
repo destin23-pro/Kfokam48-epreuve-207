@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: kfokam48-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: kfokam48_db
+      POSTGRES_USER: kfokam_user
+      POSTGRES_PASSWORD: kfokam_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kfokam48-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/kfokam48_db
+      - SPRING_DATASOURCE_USERNAME=kfokam_user
+      - SPRING_DATASOURCE_PASSWORD=kfokam_password
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

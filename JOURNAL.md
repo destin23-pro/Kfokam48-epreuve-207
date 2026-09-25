@@ -8,3 +8,6 @@ Fait : Rédaction complète des 10 sections du cahier des charges dans docs/CAHI
 
 ## Étape 2 — Conception & Architecture
 Fait : Définition de l'architecture technique conteneurisée avec PostgreSQL, modèle BDD SQL et intégration des 3 diagrammes Mermaid.
+
+## Étape 3 — Mise en place du Backend & Conteneurisation
+Fait : Configuration de Docker Compose pour l'environnement de base de données PostgreSQL.
