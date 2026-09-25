@@ -8,13 +8,14 @@ stateDiagram-v2
 
     state choix <<choice>>
     DEPOSE --> choix : tirage du relecteur (EF5)
-    choix --> EN_RELECTURE : un autre étudiant présent, relecture créée (RG7, RG2)
+    choix --> EN_RELECTURE : au moins un autre présent, 1 ou 2 relectures créées (RG7, RG2)
     choix --> DEPOSE : aucun autre présent, reste en attente (RG13)
 
     DEPOSE --> DEPOSE : remplacement du lien (RG9)
     EN_RELECTURE --> EN_RELECTURE : remplacement du lien (RG9)
 
-    EN_RELECTURE --> RELU : relecture rendue, note entière 0 à 20 (RG3)
+    EN_RELECTURE --> EN_RELECTURE : 1re relecture rendue, note provisoire (RG15)
+    EN_RELECTURE --> RELU : toutes les relectures rendues, note = moyenne (RG14)
     RELU --> [*]
 
     note right of DEPOSE
@@ -36,5 +37,6 @@ stateDiagram-v2
 | → DEPOSE | Dépôt d'un lien | 400 `LIEN_INVALIDE`, 409 `EXERCICE_DEJA_DEPOSE`, session clôturée |
 | DEPOSE → EN_RELECTURE | Dépôt, si un autre étudiant est présent | — |
 | DEPOSE ou EN_RELECTURE → lui-même | Remplacement du lien | — |
-| EN_RELECTURE → RELU | Relecture rendue | 400 `NOTE_INVALIDE`, 403 `AUTO_RELECTURE_INTERDITE` |
+| EN_RELECTURE → EN_RELECTURE | Première des deux relectures rendue : note provisoire (RG15) | 400 `NOTE_INVALIDE` |
+| EN_RELECTURE → RELU | Dernière relecture attribuée rendue : note = moyenne (RG14) | 400 `NOTE_INVALIDE`, 403 `AUTO_RELECTURE_INTERDITE` |
 | Depuis RELU | Nouvelle relecture ou remplacement du lien | 409 `RELECTURE_DEJA_RENDUE`, 409 `EXERCICE_DEJA_RELU` |

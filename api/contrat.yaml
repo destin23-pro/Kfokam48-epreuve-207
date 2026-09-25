@@ -235,6 +235,7 @@ paths:
           description: |
             5 codes erronés consécutifs : étudiant bloqué 2 minutes (`TROP_DE_TENTATIVES`, RG4).
             Ajouté au contrat imposé (décision tracée en section 7 du cahier des charges).
+            HORS PÉRIMÈTRE v1.0 : sacrifié à l'étape 3 (issue #12), jamais renvoyé en v1.0.
           content:
             application/json:
               schema:
@@ -247,7 +248,7 @@ paths:
       summary: "[IMPOSÉ] Déposer le lien de son exercice (EF4)"
       description: |
         Accepté tant que la session n'est pas clôturée (RG8). Au dépôt, le système tire
-        au hasard un relecteur parmi les présents, auteur exclu (EF5, RG7, RG2) :
+        au hasard **deux** relecteurs différents parmi les présents, auteur exclu (EF5, RG7, RG2) :
         `statut` vaut alors `EN_RELECTURE`, sinon `DEPOSE` (RG13).
       operationId: deposerExercice
       requestBody:
@@ -312,8 +313,8 @@ paths:
   /api/exercices/{id}:
     put:
       tags: [Exercices]
-      summary: Remplacer le lien de son exercice (RG9)
-      description: Possible tant que la relecture n'est pas rendue (Q13).
+      summary: Remplacer le lien de son exercice (RG9) — HORS PÉRIMÈTRE v1.0
+      description: Sacrifié à l'étape 3 (issue #17). Non implémenté en v1.0.
       operationId: remplacerLienExercice
       parameters:
         - $ref: '#/components/parameters/IdChemin'
@@ -630,8 +631,10 @@ components:
         lien: { type: string }
         soumissionAt: { type: string, format: date-time }
         statut: { $ref: '#/components/schemas/StatutExercice' }
-        note: { type: integer, nullable: true, description: "Renseignée quand statut = RELU" }
-        commentaire: { type: string, nullable: true }
+        note: { type: number, format: double, nullable: true, description: "Moyenne des notes rendues (RG14), null si aucune" }
+        noteProvisoire: { type: boolean, description: "true si une seule des deux relectures est rendue (RG15)" }
+        relecturesRendues: { type: integer, description: "0, 1 ou 2" }
+        commentaires: { type: array, items: { type: string }, description: "Commentaires des relectures rendues, sans relecteur (RG12)" }
 
     StatutExercice:
       type: string
@@ -678,7 +681,7 @@ components:
         nom: { type: string }
         presences: { type: integer, description: "Nombre de sessions où l'étudiant est présent, toutes sources" }
         exercicesDeposes: { type: integer }
-        moyenne: { type: number, format: double, nullable: true, description: "RG14 : null si aucune note reçue" }
+        moyenne: { type: number, format: double, nullable: true, description: "RG14 : moyenne des notes d'exercice (provisoires comprises, RG15), null si aucune" }
         relecturesEnAttente: { type: integer, description: "Relectures attribuées à l'étudiant et non rendues" }
 
     PromotionResponse:
